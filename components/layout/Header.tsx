@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaTelegramPlane } from "react-icons/fa";
 
 const NAV_LINKS = [
   { name: "About", href: "#about" },
@@ -51,12 +51,13 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleSectionScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
-    e.preventDefault();
-    const section = document.querySelector(href);
-    if (!section) return;
-    section.scrollIntoView({ behavior: "smooth" });
-  };
+  const handleNavClick =
+    (href: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      const section = document.querySelector(href);
+      if (!section) return;
+      section.scrollIntoView({ behavior: "smooth" });
+    };
 
   return (
     <header
@@ -65,9 +66,11 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / name */}
+        {/* Logo / name with gradient */}
         <Link href="#home" className="flex items-center gap-2">
-          <span className="text-sm font-mono text-slate-400">amir.dev</span>
+          <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent text-sm md:text-base font-bold tracking-tight">
+            amir.dev
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -75,15 +78,18 @@ export function Header() {
           {NAV_LINKS.map((link) => {
             const isActive = activeSection === link.href;
             return (
-              <button
+              <motion.button
                 key={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="relative cursor-pointer px-1 py-0.5 text-xs uppercase tracking-[0.18em]"
+                onClick={handleNavClick(link.href)}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative cursor-pointer px-1 py-0.5 text-xs uppercase tracking-[0.18em] transition-colors"
               >
                 <span
                   className={
-                    "transition-colors " +
-                    (isActive ? "text-cyan-300" : "text-slate-300 hover:text-white")
+                    isActive
+                      ? "text-cyan-300"
+                      : "text-slate-300 hover:text-cyan-300"
                   }
                 >
                   {link.name}
@@ -91,37 +97,46 @@ export function Header() {
                 {isActive && (
                   <motion.span
                     layoutId="header-active-underline"
-                    className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-fuchsia-500 to-cyan-400"
+                    className="absolute inset-x-0 -bottom-1 h-[2px] rounded-full bg-linear-to-r from-fuchsia-500 to-cyan-400"
                   />
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </nav>
 
-        {/* Socials (desktop only) */}
-        <div className="hidden items-center gap-3 text-slate-400 md:flex">
-          <Link
+        {/* Socials – always visible (mobile + desktop) */}
+        <div className="flex items-center gap-3 text-slate-400">
+          <motion.a
             href="https://github.com/"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-cyan-400 transition-colors"
+            whileHover={{ scale: 1.15, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="transition-colors hover:text-cyan-400"
           >
-            <FaGithub className="h-4 w-4" />
-          </Link>
-          <Link
+            <FaGithub className="h-5 w-5" />
+          </motion.a>
+          <motion.a
             href="https://linkedin.com/"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-cyan-400 transition-colors"
+            whileHover={{ scale: 1.15, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="transition-colors hover:text-cyan-400"
           >
-            <FaLinkedin className="h-4 w-4" />
-          </Link>
-        </div>
-
-        {/* On mobile, header stays minimal; nav is handled by MobileBottomNav */}
-        <div className="flex items-center gap-2 md:hidden">
-          <span className="text-xs font-mono text-slate-500">Menu</span>
+            <FaLinkedin className="h-5 w-5" />
+          </motion.a>
+          <motion.a
+            href="https://t.me/"
+            target="_blank"
+            rel="noreferrer"
+            whileHover={{ scale: 1.15, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="transition-colors hover:text-cyan-400"
+          >
+            <FaTelegramPlane className="h-5 w-5" />
+          </motion.a>
         </div>
       </div>
     </header>
