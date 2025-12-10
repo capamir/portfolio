@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
+import { Hero } from "@/components/sections";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Amir Noruzi | Full‑stack Web Developer",
+  description:
+    "Portfolio of Amir Noruzi – building fast, reliable, production‑ready web applications with modern web technologies.",
+};
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="p-8">TODO: Portfolio layout</div>
+    <main className="min-h-screen">
+      <Hero />
+      {/* Later: AboutSection, ProjectsSection, SkillsSection, ContactSection */}
     </main>
   );
 }

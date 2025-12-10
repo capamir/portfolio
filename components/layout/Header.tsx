@@ -97,7 +97,7 @@ export function Header() {
                 {isActive && (
                   <motion.span
                     layoutId="header-active-underline"
-                    className="absolute inset-x-0 -bottom-1 h-[2px] rounded-full bg-linear-to-r from-fuchsia-500 to-cyan-400"
+                    className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-fuchsia-500 to-cyan-400"
                   />
                 )}
               </motion.button>
