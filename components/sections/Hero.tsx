@@ -20,6 +20,14 @@ const EXPERIENCE = "2+ years";
 const STACK = ["Next.js", "Go", "Django", "PostgreSQL"];
 const CURRENT = "Shipping clean, production‑ready code";
 
+const TITLE_SEQUENCE  = [
+  NAME,
+  "a Python backend developer",
+  "a React front‑end developer",
+  "a Go developer",
+  NAME,
+];
+
 interface Token {
   text: string;
   className?: string;
@@ -122,6 +130,55 @@ function Typewriter({ tokens, speed = 35 }: { tokens: Token[]; speed?: number })
 // --- Left side: intro / text / CTAs ---
 
 function HeroIntro() {
+    const [seqIndex, setSeqIndex] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Type / delete logic for the dynamic part after "I'm "
+  useEffect(() => {
+    const full = TITLE_SEQUENCE[seqIndex];
+
+    let delay = isDeleting ? 40 : 80;
+
+    // Pause when a phrase is fully typed
+    if (!isDeleting && typed === full) {
+      delay = 900;
+    }
+
+    // Pause briefly when cleared before next phrase
+    if (isDeleting && typed === "") {
+      delay = 400;
+    }
+
+    const timeout = setTimeout(() => {
+      // Final state: stop when last phrase (NAME) is fully typed
+      if (!isDeleting && typed === full && seqIndex === TITLE_SEQUENCE.length - 1) {
+        return;
+      }
+
+      if (!isDeleting) {
+        // Typing
+        if (typed.length < full.length) {
+          setTyped(full.slice(0, typed.length + 1));
+        } else {
+          // Start deleting (except for final phrase, handled above)
+          setIsDeleting(true);
+        }
+      } else {
+        // Deleting
+        if (typed.length > 0) {
+          setTyped(full.slice(0, typed.length - 1));
+        } else {
+          // Move to next phrase
+          setIsDeleting(false);
+          setSeqIndex((prev) => (prev + 1) % TITLE_SEQUENCE.length);
+        }
+      }
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [typed, isDeleting, seqIndex]);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -40 }}
@@ -139,7 +196,7 @@ function HeroIntro() {
         00. Home
       </motion.div>
 
-      {/* Heading */}
+      {/* Heading with typewriter name/title */}
       <motion.h1
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -150,12 +207,12 @@ function HeroIntro() {
         <span className="block">
           I&apos;m{" "}
           <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
-            {NAME}
+            {typed || "\u00A0"}
           </span>
         </span>
       </motion.h1>
 
-      {/* Tagline */}
+      {/* Tagline (unchanged) */}
       <motion.p
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -215,7 +272,7 @@ function HeroIntro() {
                 "0 0 12px rgba(147,51,234,0.5), 0 0 24px rgba(6,182,212,0.4)",
             }}
             whileTap={{ scale: 0.96 }}
-            className="inline-flex items-center gap-2 rounded-lg border border-transparent bg-linear-to-r from-fuchsia-600 to-cyan-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all"
+            className="inline-flex items-center gap-2 rounded-lg border border-transparent bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all"
           >
             <FaPaperPlane className="h-4 w-4" />
             <span>Contact me</span>
@@ -286,27 +343,37 @@ function HeroJsonCard() {
       transition={{ duration: 0.7, delay: 0.3 }}
       className="w-full max-w-lg mx-auto"
     >
-      <div className="rounded-xl border border-slate-700/70 bg-[#0b1220] shadow-2xl overflow-hidden">
-        {/* Editor header */}
-        <div className="flex items-center justify-between border-b border-slate-700 bg-[#020617]/80 px-4 py-3">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+      {/* Floating wrapper */}
+      <motion.div
+        animate={{ y: [0, -10, 0] }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <div className="rounded-xl border border-slate-700/70 bg-[#0b1220] shadow-2xl overflow-hidden">
+          {/* Editor header */}
+          <div className="flex items-center justify-between border-b border-slate-700 bg-[#020617]/80 px-4 py-3">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              profile.json — amir.dev
+            </span>
+            <span className="text-[10px] font-mono text-slate-600">readonly</span>
           </div>
-          <span className="text-xs font-mono text-slate-400">
-            profile.json — amir.dev
-          </span>
-          <span className="text-[10px] font-mono text-slate-600">readonly</span>
-        </div>
 
-        {/* Code content */}
-        <div className="p-4 sm:p-5 font-mono text-xs sm:text-sm text-slate-200">
-          <pre className="whitespace-pre-wrap leading-relaxed">
-            <Typewriter tokens={codeTokens} speed={35} />
-          </pre>
+          {/* Code content */}
+          <div className="p-4 sm:p-5 font-mono text-xs sm:text-sm text-slate-200">
+            <pre className="whitespace-pre-wrap leading-relaxed">
+              <Typewriter tokens={codeTokens} speed={55} />
+            </pre>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
