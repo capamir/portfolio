@@ -20,7 +20,7 @@ const EXPERIENCE = "2+ years";
 const STACK = ["Next.js", "Go", "Django", "PostgreSQL"];
 const CURRENT = "Shipping clean, production‑ready code";
 
-const TITLE_SEQUENCE  = [
+const TITLE_SEQUENCE = [
   NAME,
   "a Python backend developer",
   "a React front‑end developer",
@@ -53,9 +53,9 @@ const codeTokens: Token[] = [
   { text: '  "stack"', className: "pl-4 text-slate-400" },
   { text: ": ", className: "text-slate-300" },
   {
-    text: `[${STACK.map((item, i) => `"${item}"${i < STACK.length - 1 ? ", " : ""}`).join(
-      ""
-    )}]`,
+    text: `[${STACK.map(
+      (item, i) => `"${item}"${i < STACK.length - 1 ? ", " : ""}`
+    ).join("")}]`,
     className: "text-orange-300",
   },
   { text: ",\n", className: "text-slate-500" },
@@ -75,9 +75,15 @@ const codeTokens: Token[] = [
   { text: "}", className: "text-slate-500" },
 ];
 
-// --- Typewriter for tokens ---
+// --- Typewriter for tokens (right card) ---
 
-function Typewriter({ tokens, speed = 35 }: { tokens: Token[]; speed?: number }) {
+function Typewriter({
+  tokens,
+  speed = 35,
+}: {
+  tokens: Token[];
+  speed?: number;
+}) {
   const [displayed, setDisplayed] = useState<{ idx: number; char: number }>({
     idx: 0,
     char: 0,
@@ -130,46 +136,43 @@ function Typewriter({ tokens, speed = 35 }: { tokens: Token[]; speed?: number })
 // --- Left side: intro / text / CTAs ---
 
 function HeroIntro() {
-    const [seqIndex, setSeqIndex] = useState(0);
+  const [seqIndex, setSeqIndex] = useState(0);
   const [typed, setTyped] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Type / delete logic for the dynamic part after "I'm "
   useEffect(() => {
     const full = TITLE_SEQUENCE[seqIndex];
-
     let delay = isDeleting ? 40 : 80;
 
-    // Pause when a phrase is fully typed
     if (!isDeleting && typed === full) {
       delay = 900;
     }
 
-    // Pause briefly when cleared before next phrase
     if (isDeleting && typed === "") {
       delay = 400;
     }
 
     const timeout = setTimeout(() => {
       // Final state: stop when last phrase (NAME) is fully typed
-      if (!isDeleting && typed === full && seqIndex === TITLE_SEQUENCE.length - 1) {
+      if (
+        !isDeleting &&
+        typed === full &&
+        seqIndex === TITLE_SEQUENCE.length - 1
+      ) {
         return;
       }
 
       if (!isDeleting) {
-        // Typing
         if (typed.length < full.length) {
           setTyped(full.slice(0, typed.length + 1));
         } else {
-          // Start deleting (except for final phrase, handled above)
           setIsDeleting(true);
         }
       } else {
-        // Deleting
         if (typed.length > 0) {
           setTyped(full.slice(0, typed.length - 1));
         } else {
-          // Move to next phrase
           setIsDeleting(false);
           setSeqIndex((prev) => (prev + 1) % TITLE_SEQUENCE.length);
         }
@@ -184,7 +187,7 @@ function HeroIntro() {
       initial={{ opacity: 0, x: -40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="flex flex-col items-center lg:items-start text-center lg:text-left"
+      className="flex flex-col items-center lg:items-start text-center lg:text-left relative"
     >
       {/* Section label */}
       <motion.div
@@ -206,13 +209,13 @@ function HeroIntro() {
         <span className="block mb-1">Hello 👋</span>
         <span className="block">
           I&apos;m{" "}
-          <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient">
             {typed || "\u00A0"}
           </span>
         </span>
       </motion.h1>
 
-      {/* Tagline (unchanged) */}
+      {/* Tagline */}
       <motion.p
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -223,18 +226,18 @@ function HeroIntro() {
         communication, and a focus on performance.
       </motion.p>
 
-      {/* Badges */}
+      {/* Badges – rounded pills with colors, larger text */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-3"
+        className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-4"
       >
         <motion.span
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.65, duration: 0.3 }}
-          className="px-3 py-1 rounded bg-white/5 text-xs font-mono text-slate-400"
+          className="inline-flex items-center rounded-full border border-sky-500/40 bg-sky-500/10 px-4 py-1.5 text-[0.8rem] font-mono text-sky-200"
         >
           {EXPERIENCE} in production
         </motion.span>
@@ -242,7 +245,7 @@ function HeroIntro() {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.75, duration: 0.3 }}
-          className="px-3 py-1 rounded bg-white/5 text-xs font-mono text-slate-400"
+          className="inline-flex items-center rounded-full border border-purple-500/40 bg-purple-500/10 px-4 py-1.5 text-[0.8rem] font-mono text-purple-200"
         >
           {ROLE}
         </motion.span>
@@ -250,9 +253,9 @@ function HeroIntro() {
           initial={{ opacity: 0, x: -10, scale: 0.9 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={{ delay: 0.85, duration: 0.35 }}
-          className="flex items-center gap-2 rounded border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-mono text-emerald-300"
+          className="inline-flex items-center gap-2 rounded-full border border-emerald-500/60 bg-emerald-500/15 px-4 py-1.5 text-[0.8rem] font-mono text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           Available for work
         </motion.span>
       </motion.div>
@@ -264,26 +267,30 @@ function HeroIntro() {
         transition={{ delay: 1, duration: 0.4 }}
         className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
       >
+        {/* Contact – animated gradient border */}
         <Link href="#contact">
           <motion.button
             whileHover={{
               y: -3,
               boxShadow:
-                "0 0 12px rgba(147,51,234,0.5), 0 0 24px rgba(6,182,212,0.4)",
+                "0 0 14px rgba(147,51,234,0.6), 0 0 28px rgba(6,182,212,0.45)",
             }}
             whileTap={{ scale: 0.96 }}
-            className="inline-flex items-center gap-2 rounded-lg border border-transparent bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all"
+            className="group relative inline-flex rounded-full p-px bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 animate-gradient"
           >
-            <FaPaperPlane className="h-4 w-4" />
-            <span>Contact me</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-black/90 px-6 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-black">
+              <FaPaperPlane className="h-4 w-4" />
+              <span>Contact me</span>
+            </span>
           </motion.button>
         </Link>
 
+        {/* Get resume – solid background */}
         <Link href="/resume.pdf" target="_blank">
           <motion.button
             whileHover={{ y: -3 }}
             whileTap={{ scale: 0.96 }}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-black/40 px-6 py-2.5 text-sm font-semibold text-slate-100 hover:border-cyan-400/70 transition-all"
+            className="inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-500/15 px-6 py-2.5 text-sm font-semibold text-slate-50 hover:bg-cyan-500/25 transition-all"
           >
             <FaDownload className="h-4 w-4" />
             <span>Get resume</span>
@@ -306,7 +313,7 @@ function HeroIntro() {
           whileTap={{ scale: 0.95 }}
           className="hover:text-cyan-400 transition-colors"
         >
-          <FaGithub className="h-5 w-5" />
+          <FaGithub className="h-7 w-7" />
         </motion.a>
         <motion.a
           href="https://linkedin.com/"
@@ -316,7 +323,7 @@ function HeroIntro() {
           whileTap={{ scale: 0.95 }}
           className="hover:text-cyan-400 transition-colors"
         >
-          <FaLinkedin className="h-5 w-5" />
+          <FaLinkedin className="h-7 w-7" />
         </motion.a>
         <motion.a
           href="https://t.me/"
@@ -326,14 +333,14 @@ function HeroIntro() {
           whileTap={{ scale: 0.95 }}
           className="hover:text-cyan-400 transition-colors"
         >
-          <FaTelegramPlane className="h-5 w-5" />
+          <FaTelegramPlane className="h-7 w-7" />
         </motion.a>
       </motion.div>
     </motion.div>
   );
 }
 
-// --- Right side: JSON editor card (auto-typing, no click) ---
+// --- Right side: JSON editor card (auto-typing, floating) ---
 
 function HeroJsonCard() {
   return (
@@ -346,11 +353,7 @@ function HeroJsonCard() {
       {/* Floating wrapper */}
       <motion.div
         animate={{ y: [0, -10, 0] }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       >
         <div className="rounded-xl border border-slate-700/70 bg-[#0b1220] shadow-2xl overflow-hidden">
           {/* Editor header */}
@@ -363,13 +366,15 @@ function HeroJsonCard() {
             <span className="text-xs font-mono text-slate-400">
               profile.json — amir.dev
             </span>
-            <span className="text-[10px] font-mono text-slate-600">readonly</span>
+            <span className="text-[10px] font-mono text-slate-600">
+              readonly
+            </span>
           </div>
 
           {/* Code content */}
           <div className="p-4 sm:p-5 font-mono text-xs sm:text-sm text-slate-200">
             <pre className="whitespace-pre-wrap leading-relaxed">
-              <Typewriter tokens={codeTokens} speed={55} />
+              <Typewriter tokens={codeTokens} speed={35} />
             </pre>
           </div>
         </div>
