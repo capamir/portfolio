@@ -51,46 +51,50 @@ function TypewriterText({
 }: {
   text: string;
   enabled?: boolean;
-  startDelay?: number; // ms
-  speed?: number; // ms per char
+  startDelay?: number;
+  speed?: number;
   className?: string;
 }) {
-  const [out, setOut] = useState(enabled ? "" : text);
+  const [out, setOut] = useState("");
 
   useEffect(() => {
-    if (!enabled) {
-      setOut(text);
-      return;
-    }
+    if (!enabled) return;
 
     let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    setOut("");
+    const startId = setTimeout(() => {
+      if (cancelled) return;
 
-    timeoutId = setTimeout(() => {
       let i = 0;
       intervalId = setInterval(() => {
         if (cancelled) return;
+
         i += 1;
         setOut(text.slice(0, i));
-        if (i >= text.length && intervalId) clearInterval(intervalId);
+
+        if (i >= text.length && intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
       }, speed);
     }, startDelay);
 
     return () => {
       cancelled = true;
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(startId);
       if (intervalId) clearInterval(intervalId);
     };
   }, [text, enabled, startDelay, speed]);
 
+  const displayText = enabled ? out : text;
+
   return (
     <p className={className}>
-      {out}
-      {/* keep layout stable while typing */}
-      {enabled && <span className="opacity-0">{text.slice(out.length)}</span>}
+      {displayText}
+      {enabled && (
+        <span className="opacity-0">{text.slice(displayText.length)}</span>
+      )}
     </p>
   );
 }
@@ -132,7 +136,7 @@ function ProfileCard({ inView }: { inView: boolean }) {
       <Card3D intensity={8}>
         <GlassCard className="relative flex flex-col items-center gap-5 bg-black/40 px-6 py-6 sm:px-7 sm:py-7">
           {/* Avatar */}
-          <div className="relative h-32 w-32 sm:h-36 sm:w-36 mx-auto rounded-full bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 p-[2px] animate-gradient">
+          <div className="relative h-36 w-36 sm:h-44 sm:w-44 mx-auto rounded-full bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 p-[2px] animate-gradient">
             <div className="h-full w-full rounded-full bg-slate-950/90 overflow-hidden">
               <Image
                 src="/profile.png"
@@ -283,37 +287,49 @@ function TerminalAbout({ inView }: { inView: boolean }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 24 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.6, delay: 0.15 }}
-      className="flex flex-col"
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
     >
-      <GlassCard className="bg-[#020617]/95 border-slate-800/80 overflow-hidden">
-        <TerminalChrome />
+      <motion.div
+        initial={{ opacity: 0, x: 24 }}
+        animate={inView ? { opacity: 1, x: 0 } : {}}
+        transition={{ duration: 0.6, delay: 0.15 }}
+        className="flex flex-col"
+      >
+        <GlassCard className="bg-[#020617]/95 border-slate-800/80 overflow-hidden">
+          <TerminalChrome />
 
-        <div className="p-6 font-mono text-sm">
-          <div className="space-y-6 text-gray-300">
-            <p className="text-xs tracking-[0.35em] text-purple-300 uppercase">
-              WHO I AM
-            </p>
+          <div className="p-6 font-mono text-sm">
+            <div className="space-y-6 text-gray-300">
+              <p className="text-xs tracking-[0.35em] text-purple-300 uppercase">
+                WHO I AM
+              </p>
 
-            {items.map((item, index) => (
-              <TerminalBullet
-                key={item.title}
-                item={item}
-                index={index}
-                inView={inView}
-                baseDelayMs={250}
-              />
-            ))}
+              {items.map((item, index) => (
+                <TerminalBullet
+                  key={item.title}
+                  item={item}
+                  index={index}
+                  inView={inView}
+                  baseDelayMs={250}
+                />
+              ))}
 
-            <div className="mt-4 text-gray-400">
-              <span className="text-cyan-400">$</span>{" "}
-              <span className="animate-cursor text-cyan-400">|</span>
+              <div className="mt-5 flex items-center gap-2 font-mono text-sm text-slate-400 border-2 p-2 border-cyan-100/50 rounded-lg">
+                {/* prompt */}
+                <span className="text-slate-600">›</span>
+                <span className="text-cyan-400">about $</span>
+
+                {/* block cursor */}
+                <span
+                  className=" inline-block h-4 w-2 rounded-[2px] bg-cyan-300/90 align-middle"
+                  style={{ animation: "terminal-caret 1s steps(1) infinite" }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </GlassCard>
+        </GlassCard>
+      </motion.div>
     </motion.div>
   );
 }
@@ -325,13 +341,9 @@ function CoreToolCard({ tech }: { tech: TechItem }) {
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 380, damping: 25 }}
-      className="group relative flex flex-col items-center justify-center rounded-xl border border-slate-800/80 bg-slate-900/60 px-4 py-4 text-center
-                 hover:border-cyan-400/40 hover:bg-slate-900/80"
+      className="group relative flex flex-col items-center justify-center rounded-xl border border-slate-800/80 bg-slate-900/60 px-4 py-4 text-center hover:border-cyan-400/40 hover:bg-slate-900/80"
     >
-      <span
-        className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/80 text-slate-300
-                   group-hover:text-cyan-300 group-hover:bg-slate-800"
-      >
+      <span className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/80 text-slate-300 group-hover:text-cyan-300 group-hover:bg-slate-800">
         <Icon className="h-7 w-7" />
       </span>
 
@@ -347,13 +359,7 @@ function CoreToolCard({ tech }: { tech: TechItem }) {
   );
 }
 
-function CoreTools({
-  inView,
-  techs,
-}: {
-  inView: boolean;
-  techs: TechItem[];
-}) {
+function CoreTools({ inView, techs }: { inView: boolean; techs: TechItem[] }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -361,12 +367,13 @@ function CoreTools({
       transition={{ duration: 0.6, delay: 0.1 }}
       className="mt-4"
     >
-      <div className="mb-4 flex flex-col gap-1 text-center lg:text-left">
-        <p className="text-xs font-mono uppercase tracking-[0.22em] text-slate-500">
-          Core tools
-        </p>
-        <p className="text-sm text-slate-400">
-          Technologies Amir uses most days.
+      <div className="mb-10 text-center">
+        <h3 className="text-3xl font-extrabold text-slate-50 tracking-tight">
+          Core Tools
+        </h3>
+
+        <p className="mt-2 text-sm sm:text-base font-mono text-slate-400">
+          <span className="text-cyan-400">›</span> Technologies I use daily
         </p>
       </div>
 
