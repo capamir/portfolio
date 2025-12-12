@@ -112,7 +112,7 @@ function AboutHeader({ inView }: { inView: boolean }) {
       </p>
 
       <h2 className="text-2xl sm:text-3xl font-semibold text-slate-50">
-        <span className="bg-gradient-to-r from-fuchsia-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
+        <span className="bg-linear-to-r from-fuchsia-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
           A bit about how and what Amir builds.
         </span>
       </h2>
@@ -136,7 +136,7 @@ function ProfileCard({ inView }: { inView: boolean }) {
       <Card3D intensity={8}>
         <GlassCard className="relative flex flex-col items-center gap-5 bg-black/40 px-6 py-6 sm:px-7 sm:py-7">
           {/* Avatar */}
-          <div className="relative h-36 w-36 sm:h-44 sm:w-44 mx-auto rounded-full bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 p-[2px] animate-gradient">
+          <div className="relative h-36 w-36 sm:h-44 sm:w-44 mx-auto rounded-full bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 p-0.5 animate-gradient">
             <div className="h-full w-full rounded-full bg-slate-950/90 overflow-hidden">
               <Image
                 src="/profile.png"
