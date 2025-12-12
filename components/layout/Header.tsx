@@ -14,7 +14,7 @@ const NAV_LINKS = [
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("");
+  const [activeSection, setActiveSection] = useState("");
 
   // Track scroll to add background / blur
   useEffect(() => {
@@ -36,7 +36,10 @@ export function Header() {
         if (!el) continue;
 
         const { offsetTop, offsetHeight } = el;
-        if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+        if (
+          scrollPosition >= offsetTop &&
+          scrollPosition < offsetTop + offsetHeight
+        ) {
           setActiveSection(`#${id}`);
           return;
         }
@@ -62,19 +65,32 @@ export function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-all ${
-        scrolled ? "backdrop-blur-md bg-black/60 border-b border-white/10" : "bg-transparent"
+        scrolled
+          ? "backdrop-blur-md bg-black/60 border-b border-white/10"
+          : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / name with gradient */}
-        <Link href="#home" className="flex items-center gap-2">
-          <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent text-sm md:text-base font-bold tracking-tight">
-            amir.dev
+        {/* Logo / name with prompt-style > and blinking _ */}
+        <Link href="#home" className="flex items-start gap-2">
+          {/* prompt arrow */}
+          <span className="text-xl md:text-lg font-mono text-slate-500">
+            {">"}
+          </span>
+
+          {/* AMIR.DEV + blinking underscore */}
+          <span className="text-2xl md:text-xl font-extrabold tracking-[0.25em] uppercase">
+            <span className="bg-linear-to-r from-fuchsia-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+              amir.dev
+            </span>
+            <span className="ml-1 inline-block align-middle text-cyan-300 animate-pulse pb-3">
+              _
+            </span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
+        <nav className="hidden items-center gap-8 text-md sm:text-[0.8rem] md:text-[16px] font-semibold text-slate-300 md:flex">
           {NAV_LINKS.map((link) => {
             const isActive = activeSection === link.href;
             return (
@@ -83,17 +99,18 @@ export function Header() {
                 onClick={handleNavClick(link.href)}
                 whileHover={{ scale: 1.06 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative cursor-pointer px-1 py-0.5 text-xs uppercase tracking-[0.18em] transition-colors"
+                className="relative cursor-pointer px-1 py-0.5 uppercase tracking-[0.18em]"
               >
                 <span
                   className={
                     isActive
-                      ? "text-cyan-300"
-                      : "text-slate-300 hover:text-cyan-300"
+                      ? "text-cyan-300 font-bold transition-colors"
+                      : "text-slate-200 hover:text-cyan-300 transition-colors"
                   }
                 >
                   {link.name}
                 </span>
+
                 {isActive && (
                   <motion.span
                     layoutId="header-active-underline"
@@ -105,7 +122,7 @@ export function Header() {
           })}
         </nav>
 
-        {/* Socials – always visible (mobile + desktop) */}
+        {/* Socials – always visible */}
         <div className="flex items-center gap-3 text-slate-400">
           <motion.a
             href="https://github.com/"
