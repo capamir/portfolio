@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hero, About, Skills } from "@/components/sections";
 import Projects from "@/components/sections/Projects";
+import Timeline from "@/components/sections/Timeline";
 
 export const metadata: Metadata = {
   title: "Amir Noruzi | Full‑stack Web Developer",
@@ -15,7 +16,8 @@ export default function HomePage() {
       <About />
       <Projects />
       <Skills />
-      {/* Later:  ProjectsSection, ContactSection */}
+      <Timeline />
+      {/* Later: ContactSection */}
     </main>
   );
 }
