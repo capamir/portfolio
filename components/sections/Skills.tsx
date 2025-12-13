@@ -534,13 +534,7 @@ function SkillsRightTerminal({ category }: { category: Category }) {
                   <span className="text-cyan-300">{CURRENTLY_LEARNING}</span>
                 </div>
 
-                <div className="mt-3 flex items-center gap-2 text-sm text-slate-400">
-                  <span className="h-4 w-0.5 rounded-full bg-slate-700/70" />
-                  <span className="text-slate-500">{category.key}</span>
-                  <span className="text-slate-600">›</span>
-                  <span className="text-cyan-400">$</span>
-                  <span className="ml-1 inline-block h-4 w-2 rounded-[2px] bg-cyan-300/90 align-middle" />
-                </div>
+                
               </div>
             </div>
           </GlassCard>
