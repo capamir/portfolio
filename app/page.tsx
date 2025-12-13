@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero, About, Skills } from "@/components/sections";
+import Projects from "@/components/sections/Projects";
 
 export const metadata: Metadata = {
   title: "Amir Noruzi | Full‑stack Web Developer",
@@ -12,6 +13,7 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Hero />
       <About />
+      <Projects />
       <Skills />
       {/* Later:  ProjectsSection, ContactSection */}
     </main>
