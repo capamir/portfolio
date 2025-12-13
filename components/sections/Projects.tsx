@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  AnimatePresence,
+} from "framer-motion";
 import { useRef } from "react";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
@@ -21,7 +26,13 @@ type Project = {
 
 function hexToRgba(hex: string, alpha: number) {
   const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const bigint = parseInt(full, 16);
 
   const r = (bigint >> 16) & 255;
@@ -41,7 +52,7 @@ function ProjectMockMedia({
   subtitle: string;
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+    <div className="relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-white/3">
       <div
         className="absolute -top-16 -right-16 h-56 w-56 rounded-full blur-3xl opacity-25"
         style={{ background: color }}
@@ -87,10 +98,10 @@ function HoverRow({
 
   return (
     <motion.div
-      whileHover={reduceMotion ? undefined : { x: 10, scale: 1.015 }}
+      whileHover={reduceMotion ? undefined : { y: -6, scale: 1.015 }}
       transition={{ type: "spring", stiffness: 420, damping: 26 }}
       className={[
-        "relative rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-colors",
+        "relative rounded-xl border border-white/10 bg-white/3 hover:bg-white/6 transition-colors",
         "will-change-transform",
         className,
       ].join(" ")}
@@ -104,18 +115,74 @@ function HoverRow({
   );
 }
 
+type ToggleChipProps = {
+  mode: "FEATURES" | "INFO";
+  color: string;
+  reduceMotion: boolean;
+  onToggle: () => void;
+  className?: string;
+};
+
+function ToggleChip({
+  mode,
+  color,
+  reduceMotion,
+  onToggle,
+  className = "",
+}: ToggleChipProps) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onToggle}
+      className={[
+        "inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-mono tracking-[0.18em]",
+        "bg-white/3 text-slate-200 hover:bg-white/6 transition-colors",
+        className,
+      ].join(" ")}
+      style={{
+        borderColor: hexToRgba(color, 0.28),
+        boxShadow: `0 0 0 1px ${hexToRgba(color, 0.18)}, 0 0 18px ${hexToRgba(
+          color,
+          0.1
+        )}`,
+      }}
+      animate={reduceMotion ? undefined : { y: [0, -2, 0] }}
+      transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <motion.span
+        aria-hidden
+        className="h-2.5 w-2.5 rounded-full"
+        style={{ background: color }}
+        animate={reduceMotion ? undefined : { scale: [1, 1.55, 1] }}
+        transition={{ duration: 1.05, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <span style={{ color }}>{mode}</span>
+    </motion.button>
+  );
+}
+
 function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const [showFeatures, setShowFeatures] = useState(false);
+
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, amount: 0.22 });
 
   const leftVariants = {
-    hidden: { opacity: 0, x: reduceMotion ? 0 : -42, scale: reduceMotion ? 1 : 0.985 },
+    hidden: {
+      opacity: 0,
+      x: reduceMotion ? 0 : -42,
+      scale: reduceMotion ? 1 : 0.985,
+    },
     show: { opacity: 1, x: 0, scale: 1 },
   };
 
   const rightVariants = {
-    hidden: { opacity: 0, x: reduceMotion ? 0 : 42, scale: reduceMotion ? 1 : 0.985 },
+    hidden: {
+      opacity: 0,
+      x: reduceMotion ? 0 : 42,
+      scale: reduceMotion ? 1 : 0.985,
+    },
     show: { opacity: 1, x: 0, scale: 1 },
   };
 
@@ -123,23 +190,49 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <div ref={ref} className="relative">
       <div
         className="pointer-events-none absolute -inset-6 opacity-25 blur-3xl"
-        style={{ background: `radial-gradient(circle at 30% 30%, ${project.color}, transparent 55%)` }}
+        style={{
+          background: `radial-gradient(circle at 30% 30%, ${project.color}, transparent 55%)`,
+        }}
       />
 
       <div className="relative rounded-3xl border border-white/10 bg-black/30 p-5 sm:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {/* LEFT: Media (slides from left) */}
+          {/* LEFT: image + tech stacks */}
           <motion.div
             variants={leftVariants}
             initial="hidden"
             animate={inView ? "show" : "hidden"}
             transition={{ duration: 0.55, delay: 0.05 + index * 0.05 }}
-            className="h-80 lg:h-[380px]"
+            className="flex flex-col gap-4"
           >
-            <ProjectMockMedia color={project.color} title={project.title} subtitle={project.subtitle} />
+            {/* fixed image */}
+            <div className="h-80 lg:h-[380px]">
+              <ProjectMockMedia
+                color={project.color}
+                title={project.title}
+                subtitle={project.subtitle}
+              />
+            </div>
+
+            {/* Tech stack under image */}
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {project.tech.map((t) => (
+                  <HoverRow
+                    key={t}
+                    color={project.color}
+                    className="px-3 py-1.5"
+                  >
+                    <span className="text-xs font-mono text-slate-200">
+                      {t}
+                    </span>
+                  </HoverRow>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
-          {/* RIGHT: Info (slides from right) */}
+          {/* RIGHT: info + toggle + features */}
           <motion.div
             variants={rightVariants}
             initial="hidden"
@@ -147,16 +240,21 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             transition={{ duration: 0.55, delay: 0.12 + index * 0.05 }}
             className="flex flex-col"
           >
+            {/* header */}
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-mono uppercase tracking-[0.22em] text-slate-500">
                   Project {String(index + 1).padStart(2, "0")}
                 </p>
-                <h3 className="mt-2 text-2xl font-semibold text-slate-50">{project.title}</h3>
-                <p className="mt-1 text-sm text-slate-400">{project.subtitle}</p>
+                <h3 className="mt-2 text-2xl font-semibold text-slate-50">
+                  {project.title}
+                </h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  {project.subtitle}
+                </p>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 justify-end">
                 {project.links.map((l) => {
                   const isDisabled = l.disabled || !l.href || l.href === "#";
                   return (
@@ -168,20 +266,27 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                       className={[
                         "px-3 py-2 rounded-xl text-xs font-mono border transition-all",
                         isDisabled
-                          ? "cursor-not-allowed opacity-50 border-white/10 bg-white/[0.03] text-slate-400"
-                          : "border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06]",
+                          ? "cursor-not-allowed opacity-50 border-white/10 bg-white/3 text-slate-400"
+                          : "border-white/10 bg-white/3 text-slate-200 hover:bg-white/6",
                       ].join(" ")}
                       style={
                         isDisabled
                           ? undefined
                           : {
                               borderColor: hexToRgba(project.color, 0.25),
-                              boxShadow: `0 0 14px ${hexToRgba(project.color, 0.10)}`,
+                              boxShadow: `0 0 14px ${hexToRgba(
+                                project.color,
+                                0.1
+                              )}`,
                             }
                       }
                     >
                       <span className="inline-flex items-center gap-2">
-                        {l.label === "GitHub" ? <FaGithub /> : <FaExternalLinkAlt />}
+                        {l.label === "GitHub" ? (
+                          <FaGithub />
+                        ) : (
+                          <FaExternalLinkAlt />
+                        )}
                         {l.label}
                       </span>
                     </a>
@@ -190,54 +295,107 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               </div>
             </div>
 
-            <p className="mt-4 text-slate-300 leading-relaxed">
-              {project.description}
-            </p>
+            {/* When features are open, show INFO toggle under header (button moved to top) */}
+            <AnimatePresence initial={false}>
+              {showFeatures ? (
+                <motion.div
+                  key="top-toggle"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25 }}
+                  className="mt-4"
+                >
+                  <ToggleChip
+                    mode="INFO"
+                    color={project.color}
+                    reduceMotion={!!reduceMotion}
+                    onToggle={() => setShowFeatures((v) => !v)}
+                    className="w-full justify-center"
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
 
-            {/* Impact */}
-            <div className="mt-5 space-y-2">
-              {project.impact.map((line) => (
-                <div key={line} className="flex items-start gap-2 text-sm text-slate-400">
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full" style={{ background: project.color }} />
-                  <span>{line}</span>
-                </div>
-              ))}
-            </div>
+            {/* Container that swaps: overview collapses, features slides up */}
+            <div className="relative mt-4 flex-1 min-h-80">
+              <AnimatePresence mode="wait" initial={false}>
+                {!showFeatures ? (
+                  <motion.div
+                    key="overview"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -18 }}
+                    transition={{ duration: 0.35 }}
+                    className="h-full"
+                  >
+                    <p className="text-slate-300 leading-relaxed">
+                      {project.description}
+                    </p>
 
-            {/* Tech pills */}
-            <div className="mt-6">
-              <p className="text-xs font-mono text-slate-500 mb-2">Tech stack</p>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((t) => (
-                  <HoverRow key={t} color={project.color} className="px-3 py-1.5">
-                    <span className="text-xs font-mono text-slate-200">{t}</span>
-                  </HoverRow>
-                ))}
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className="mt-6 flex-1">
-              <p className="text-xs font-mono text-slate-500 mb-2">Key features</p>
-              <div className="space-y-3">
-                {project.features.map((f) => (
-                  <HoverRow key={f} color={project.color} className="px-4 py-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm font-mono text-slate-200">{f}</span>
-                      <span className="text-xs font-mono text-slate-500 italic">Hover for details</span>
+                    <div className="mt-5 space-y-2">
+                      {project.impact.slice(0, 2).map((line) => (
+                        <div
+                          key={line}
+                          className="flex items-start gap-2 text-sm text-slate-400"
+                        >
+                          <span
+                            className="mt-1 h-1.5 w-1.5 rounded-full"
+                            style={{ background: project.color }}
+                          />
+                          <span>{line}</span>
+                        </div>
+                      ))}
                     </div>
-                  </HoverRow>
-                ))}
-              </div>
-            </div>
 
-            {/* Footer mini prompt */}
-            <div className="mt-6 pt-4 border-t border-white/10 text-sm font-mono text-slate-400">
-              <span className="text-slate-600">{project.title.toLowerCase().replace(/\s+/g, "_")}</span>
-              <span className="text-slate-600"> › </span>
-              <span className="text-cyan-400">$</span>
-              <span className="ml-2 text-slate-300">showcase</span>
-              <span className="ml-2 inline-block h-4 w-2 rounded-[2px] bg-cyan-300/90 align-middle" />
+                    {/* Bottom FEATURES button (only text + pulse) */}
+                    <div className="mt-6 pt-4 border-t border-white/10">
+                      <ToggleChip
+                        mode="FEATURES"
+                        color={project.color}
+                        reduceMotion={!!reduceMotion}
+                        onToggle={() => setShowFeatures((v) => !v)}
+                        className="w-full justify-center"
+                      />
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="features"
+                    initial={{ opacity: 0, y: 42 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 42 }}
+                    transition={{ duration: 0.35 }}
+                    className="absolute inset-0"
+                  >
+                    {/* Features list comes from bottom */}
+                    <div className="h-full rounded-2xl border border-white/10 bg-white/3 p-4 sm:p-5 flex flex-col">
+                      <p className="text-xs font-mono uppercase tracking-[0.22em] text-slate-500">
+                        Key features
+                      </p>
+
+                      <div className="mt-4 space-y-3 overflow-auto pr-1">
+                        {project.features.map((f) => (
+                          <HoverRow
+                            key={f}
+                            color={project.color}
+                            className="px-4 py-3"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-sm font-mono text-slate-200">
+                                {f}
+                              </span>
+                              <span className="text-xs font-mono text-slate-500 italic">
+                                Hover
+                              </span>
+                            </div>
+                          </HoverRow>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>
@@ -266,7 +424,12 @@ export default function Projects() {
           "Focused on reliability: edge cases, validation, and predictable errors.",
         ],
         tech: ["Django", "DRF", "PostgreSQL", "Redis", "Docker", "Next.js"],
-        features: ["Inventory movements", "Cart & checkout", "Role-based admin", "Search & filtering"],
+        features: [
+          "Inventory movements",
+          "Cart & checkout",
+          "Role-based admin",
+          "Search & filtering",
+        ],
         color: "#9333EA",
         links: [
           { label: "GitHub", href: "#", disabled: true },
@@ -285,7 +448,12 @@ export default function Projects() {
           "Kept the codebase modular to support future microservice splits.",
         ],
         tech: ["Go", "PostgreSQL", "Redis", "Docker", "REST", "OpenAPI"],
-        features: ["Idempotent workflows", "Retry & backoff", "Service boundaries", "Structured logging"],
+        features: [
+          "Idempotent workflows",
+          "Retry & backoff",
+          "Service boundaries",
+          "Structured logging",
+        ],
         color: "#06B6D4",
         links: [
           { label: "GitHub", href: "#", disabled: true },
@@ -321,13 +489,14 @@ export default function Projects() {
 
           <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-50">
             Selected{" "}
-            <span className="bg-gradient-to-r from-fuchsia-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-fuchsia-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
               Work
             </span>
           </h2>
 
           <p className="mt-3 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-            Two placeholder projects for now—swap the content with your real repos/screenshots when ready.
+            Two placeholder projects for now—swap the content with your real
+            repos/screenshots when ready.
           </p>
         </motion.div>
 
