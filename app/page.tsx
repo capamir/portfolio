@@ -3,6 +3,7 @@ import { Hero, About, Skills } from "@/components/sections";
 import Projects from "@/components/sections/Projects";
 import Timeline from "@/components/sections/Timeline";
 import HowIWork from "@/components/sections/HowIWork";
+import Contact from "@/components/sections/Contact";
 
 export const metadata: Metadata = {
   title: "Amir Noruzi | Full‑stack Web Developer",
@@ -19,6 +20,7 @@ export default function HomePage() {
       <Skills />
       <Timeline />
       <HowIWork />
+      <Contact />
       {/* Later: ContactSection */}
     </main>
   );

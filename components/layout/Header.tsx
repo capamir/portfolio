@@ -125,7 +125,7 @@ export function Header() {
         {/* Socials – always visible */}
         <div className="flex items-center gap-3 text-slate-400">
           <motion.a
-            href="https://github.com/"
+            href="https://github.com/capamir"
             target="_blank"
             rel="noreferrer"
             whileHover={{ scale: 1.15, y: -2 }}
@@ -135,7 +135,7 @@ export function Header() {
             <FaGithub className="h-5 w-5" />
           </motion.a>
           <motion.a
-            href="https://linkedin.com/"
+            href="https://linkedin.com/capamir"
             target="_blank"
             rel="noreferrer"
             whileHover={{ scale: 1.15, y: -2 }}
@@ -145,7 +145,7 @@ export function Header() {
             <FaLinkedin className="h-5 w-5" />
           </motion.a>
           <motion.a
-            href="https://t.me/"
+            href="https://t.me/capamir"
             target="_blank"
             rel="noreferrer"
             whileHover={{ scale: 1.15, y: -2 }}
