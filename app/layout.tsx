@@ -9,7 +9,7 @@ import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { Header } from "@/components/layout/Header";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-// import { Footer } from "@/components/layout/Footer";
+import Footer from "@/components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="flex min-h-screen flex-col relative z-10">
           <Header />
           <main className="flex-1 pt-16 md:pt-20">{children}</main>
-          {/* <Footer /> */}
+          <Footer />
         </div>
 
         {/* Mobile bottom nav (icons only, like Instagram) */}
