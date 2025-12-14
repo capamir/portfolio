@@ -170,7 +170,7 @@ export default function Contact() {
                     </div>
 
                     {/* System info */}
-                    <div className="space-y-2 mb-6 pb-6 border-b border-white/10">
+                    <div className="space-y-2  border-white/10">
                       <p className="text-slate-500">System Info:</p>
                       <div className="flex items-center gap-2 text-slate-300">
                         <span className="text-cyan-400">📍</span>
@@ -275,7 +275,7 @@ export default function Contact() {
 
             <div className="p-6 sm:p-8 font-mono">
               {/* API-style header */}
-              <div className="mb-6 pb-4 border-b border-white/10">
+              <div className="mb-3 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2 mb-2">
                   <span
                     className="h-2 w-2 rounded-full animate-pulse"
@@ -285,9 +285,7 @@ export default function Contact() {
                     Send Message
                   </p>
                 </div>
-                <p className="text-xs font-mono text-slate-600">
-                  POST /api/v1/contact/message
-                </p>
+                
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
